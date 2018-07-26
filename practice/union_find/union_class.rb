@@ -2,14 +2,16 @@ class UF
   # these technically should be private
   # interesting to call nodes after calling other
   # methods to see how root changes data structure
-  attr_accessor :nodes, :sizes
+  attr_accessor :nodes, :sizes, :largest
 
   def initialize(size)
     self.nodes = []
     self.sizes = []
+    self.largest = []
     size.times do |node| 
       nodes << node
       sizes << 1
+      largest << node
     end
   end
 
@@ -29,10 +31,17 @@ class UF
       # i now points to j's root
       nodes[i] = j
       sizes[j] += sizes[i]
+      largest[j] = [ largest[j], largest[i] ].max
     else
       nodes[j] = i
       sizes[i] += sizes[j]
+      largest[i] = [ largest[j], largest[i] ].max
     end
+  end
+
+  def find(node)
+    i = root(node)
+    largest[i]
   end
 
   private
