@@ -64,3 +64,39 @@ class UF
 end
 
 # Question 3
+
+class SuccessorList
+  
+  attr_accessor :id, :last
+
+  def initialize(n)
+    self.last = []
+    self.id = []
+    n.times do |index|
+      last << nil
+      id << index
+    end
+  end
+
+  def delete(i)
+    # returns if node already deleted
+    return if id[i] != i
+    # get the next biggest element
+    next_id = successor(i + 1)
+    # keep track of node pointing to element
+    last[next_id] = i if next_id
+    prev = last[i]
+    id[prev] = next_id if prev
+    id[i] = next_id
+  end
+
+  def successor(i)
+    return nil if i >= id.size || id[i].nil?
+    until i == id[i]
+      id[i] = id[id[i]]
+      i = id[i]
+    end
+    i
+  end
+
+end
