@@ -10,19 +10,19 @@ public class Percolation {
 
     public void open(int row, int col) {
         // open site (row, col) if it is not open already
-
+        //REMBMER: row and col ARE NOT INDEX VALUES! add 1 to each to access proper arr coord
         // if site is 0, make it 1
     }
 
     public boolean isOpen(int row, int col) {
         // is site (row, col) open?
-
+        //REMBMER: row and col ARE NOT INDEX VALUES! add 1 to each to access proper arr coord
         //return true if site is over 0
     }
 
     public boolean isFull(int row, int col) {
         // is site (row, col) full?
-
+        //REMBMER: row and col ARE NOT INDEX VALUES! add 1 to each to access proper arr coord
         // return true if site == 2
     }
 
@@ -48,5 +48,9 @@ public class Percolation {
 
     public static void main(String[] args) {
         // test client (optional)
+    }
+
+    private int coordToValue(int row, int col){
+        // return UF value
     }
 }
