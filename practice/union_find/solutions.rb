@@ -1,5 +1,6 @@
 # Question 1
-# making the assumption that the log file is an integer value
+# log is sorted, so we can assume that returning the time
+# when all_connected returns true is a valid answer 
 
 class UF
   # these technically should be private
