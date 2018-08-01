@@ -35,7 +35,7 @@ public class Percolation {
             // System.out.println("opening row:" + row + " col: " + col);
             int current = coordToValue(row, col);
             if(row == 1) union(current, top);
-            if(row == grid.length) union(current, bot);
+            if(row == grid.length && !percolates()) union(current, bot);
 
             ArrayList<Integer> open = getAdjacentOpen(row, col);
 
