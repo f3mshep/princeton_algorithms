@@ -35,7 +35,7 @@ public class Percolation {
             // System.out.println("opening row:" + row + " col: " + col);
             int current = coordToValue(row, col);
             if(row == 1) union(current, top);
-            if(row == grid.length && !percolates()) union(current, bot);
+            if(row == grid.length && !percolated) union(current, bot);
 
             ArrayList<Integer> open = getAdjacentOpen(row, col);
 
@@ -57,6 +57,7 @@ public class Percolation {
         // return true if site is over 0
         int i = row - 1;
         int j = col - 1;
+        if(!inBounds(i,j)) throw new IllegalArgumentException();
         return grid[i][j] > 0;
     }
 
@@ -66,6 +67,7 @@ public class Percolation {
         // REMBMER: row and col ARE NOT INDEX VALUES! add 1 to each to access proper arr coord
         // returns true if UF site is connected to top
         int site = coordToValue(row, col);
+        if(!inBounds(row - 1,col - 1)) throw new IllegalArgumentException();
         return connected(top, site);
     }
 
@@ -89,7 +91,8 @@ public class Percolation {
         // "virtual" top and bottom sites, which point to every site on top and
         // bottom
 
-        return connected(top, bot);
+        percolated = connected(top, bot);
+        return percolated;
     }
 
     public static void main(String[] args) {
@@ -99,7 +102,7 @@ public class Percolation {
         System.out.println(val);
     }
 
-    public int coordToValue(int row, int col) {
+    private int coordToValue(int row, int col) {
         // return UF value
         // this is COORD not INDEX to value
 
@@ -131,6 +134,8 @@ public class Percolation {
         if (j < 0 || j >= grid.length ) return false;
         return true;
     }
+
+
 
     private void union(int p, int q) {
         uf.union(p, q);
