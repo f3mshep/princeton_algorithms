@@ -1,8 +1,10 @@
 import edu.princeton.cs.algs4.UF;
 
+import java.util.ArrayList;
+
 public class Percolation {
 
-    public int[][] grid;
+    private int[][] grid;
     private int openSites;
     private UF uf;
     private int top;
@@ -19,42 +21,51 @@ public class Percolation {
         int len = (n * n) + 2;
         uf = new UF(len);
         top = len - 1;
-        bot = len;
+        bot = len - 2;
         // connect top and bottom rows to virtual top and bot sites
-        for (int i = 0; i < grid[0].length; i++)
-        {
-            int site = coordToValue(1, i + 1);
-            union(site, top);
-            site = coordToValue(grid.length, i + 1);
-            union(site, bot);
-        }
     }
 
     public void open(int row, int col) {
         // open site (row, col) if it is not open already
         // REMBMER: row and col ARE NOT INDEX VALUES! add 1 to each to access proper arr coord
-        // if site is 0, make it 1
-        row -= 1;
-        col -= 1;
-        openSites +=1;
-        if(grid[row][col] == 0) grid[row][col] = 1;
+        // CHANGE OPEN TO ALSO UNION IF SITE IS IN TOP OR BOT ROW
+
+        if (!isOpen(row, col)) {
+            // System.out.println("opening row:" + row + " col: " + col);
+            int current = coordToValue(row, col);
+            if(row == 1) union(current, top);
+            if(row == grid.length) union(current, bot);
+
+            ArrayList<Integer> open = getAdjacentOpen(row, col);
+
+            int i = row - 1;
+            int j = col - 1;
+            openSites += 1;
+            grid[i][j] = 1;
+            for (int site : open) {
+                union(site, current);
+            }
+
+        }
+
     }
 
     public boolean isOpen(int row, int col) {
         // is site (row, col) open?
         // REMBMER: row and col ARE NOT INDEX VALUES! add 1 to each to access proper arr coord
         // return true if site is over 0
-        row -= 1;
-        col -= 1;
-        return grid[col][row] > 0;
+        int i = row - 1;
+        int j = col - 1;
+        return grid[i][j] > 0;
     }
 
     public boolean isFull(int row, int col) {
         // is site (row, col) full?
+
         // REMBMER: row and col ARE NOT INDEX VALUES! add 1 to each to access proper arr coord
         // returns true if UF site is connected to top
         int site = coordToValue(row, col);
-        return uf.connected(top, site);
+        return connected(top, site);
     }
 
     public int numberOfOpenSites() {
@@ -76,24 +87,54 @@ public class Percolation {
         // either way, top and bottom of each UF class will point to
         // "virtual" top and bottom sites, which point to every site on top and
         // bottom
-        return true;
+        return connected(top, bot);
     }
 
     public static void main(String[] args) {
         // test client (optional)
-        Percolation test = new Percolation(3);
-        System.out.println(test.grid);
+        Percolation test = new Percolation(6);
+        int val = test.coordToValue(6,0);
+        System.out.println(val);
     }
 
-    private int coordToValue(int row, int col)
-    {
+    public int coordToValue(int row, int col) {
         // return UF value
         // this is COORD not INDEX to value
-        return col + (grid[0].length * (row - 1));
+
+        int val = col + (grid[0].length * (row - 1)) - 1;
+        return val;
     }
 
-    private void union(int p, int q)
-    {
+    private ArrayList<Integer> getAdjacentOpen(int row, int col) {
+        int i = row - 1;
+        int j = col - 1;
+        ArrayList<Integer> open = new ArrayList<Integer>();
+        if (inBounds(i + 1, j) && grid[i + 1][j] > 0) {
+            open.add(coordToValue(row + 1, col));
+        }
+        if (inBounds(i - 1, j) && grid[i - 1][j] > 0) {
+            open.add(coordToValue(row - 1, col));
+        }
+        if (inBounds(i, j + 1) && grid[i][j + 1] > 0) {
+            open.add(coordToValue(row, col + 1));
+        }
+        if (inBounds(i, j - 1) && grid[i][j - 1] > 0) {
+            open.add(coordToValue(row, col - 1));
+        }
+        return open;
+    }
+
+    private boolean inBounds(int i, int j) {
+        if (i < 0 || i >= grid.length ) return false;
+        if (j < 0 || j >= grid.length ) return false;
+        return true;
+    }
+
+    private void union(int p, int q) {
         uf.union(p, q);
+    }
+
+    private boolean connected(int p, int q) {
+        return uf.connected(p, q);
     }
 }
