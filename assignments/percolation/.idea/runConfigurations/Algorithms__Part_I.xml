@@ -2,7 +2,7 @@
   <configuration default="false" name="Algorithms, Part I" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="PercolationVisualizer" />
     <module name="Algorithms, Part I" />
-    <option name="PROGRAM_PARAMETERS" value="input20.txt" />
+    <option name="PROGRAM_PARAMETERS" value="input50.txt" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
