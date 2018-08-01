@@ -1,24 +1,24 @@
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
-import java.util.ArrayList;
-
 
 
 public class Percolation {
 
-    private int[][] grid;
+    private boolean[][] grid;
     private int openSites;
     private WeightedQuickUnionUF uf;
-    private int top;
-    private int bot;
+    private WeightedQuickUnionUF backwash;
+    private final int VIRTUAL_TOP;
+    private final int VIRTUAL_BOT;
     private boolean percolated;
 
     public  Percolation(int n) {
         // create n-by-n grid, with all sites blocked
-        grid = new int[n][n];
+        grid = new boolean[n][n];
         int len = (n * n) + 2;
         uf = new WeightedQuickUnionUF(len);
-        top = len - 1;
-        bot = len - 2;
+        backwash = new WeightedQuickUnionUF(len);
+        VIRTUAL_TOP = len - 1;
+        VIRTUAL_BOT = len - 2;
         // connect top and bottom rows to virtual top and bot sites
     }
 
@@ -26,18 +26,15 @@ public class Percolation {
         // open site (row, col) if it is not open already
         if (!isOpen(row, col)) {
             // System.out.println("opening row:" + row + " col: " + col);
-            int current = coordToValue(row, col);
-            if(row == 1) union(current, top);
-            ArrayList<Integer> open = getAdjacentOpen(row, col);
             int i = row - 1;
             int j = col - 1;
+            int current = coordToValue(row, col);
+            if(row == 1) union(current, VIRTUAL_TOP);
             openSites += 1;
-            grid[i][j] = 1;
-            for (int site : open) {
-                union(site, current);
-            }
-            if (row == grid.length && !percolated && connected(top, current)) {
-                union(current, bot);
+            grid[i][j] = true;
+            connectAdjacent(row, col);
+            if (row == grid.length ) {
+                unionBackwash(current);
             }
         }
 
@@ -48,14 +45,14 @@ public class Percolation {
         int i = row - 1;
         int j = col - 1;
         if(!inBounds(i,j)) throw new IllegalArgumentException();
-        return grid[i][j] > 0;
+        return grid[i][j];
     }
 
     public boolean isFull(int row, int col) {
         // is site (row, col) full?
         int site = coordToValue(row, col);
         if(!inBounds(row - 1,col - 1)) throw new IllegalArgumentException();
-        return connected(top, site);
+        return connected(VIRTUAL_TOP, site);
     }
 
     public int numberOfOpenSites() {
@@ -66,7 +63,7 @@ public class Percolation {
     public boolean percolates() {
         // does the system percolate?
 
-        percolated = connected(top, bot);
+        percolated = backwash.connected(VIRTUAL_TOP, VIRTUAL_BOT);
         return percolated;
     }
 
@@ -85,23 +82,22 @@ public class Percolation {
         return val;
     }
 
-    private ArrayList<Integer> getAdjacentOpen(int row, int col) {
+    private void connectAdjacent(int row, int col) {
         int i = row - 1;
         int j = col - 1;
-        ArrayList<Integer> open = new ArrayList<Integer>();
-        if (inBounds(i + 1, j) && grid[i + 1][j] > 0) {
-            open.add(coordToValue(row + 1, col));
+        int current = coordToValue(row, col);
+        if (inBounds(i + 1, j) && grid[i + 1][j]) {
+            union(coordToValue(row + 1, col), current);
         }
-        if (inBounds(i - 1, j) && grid[i - 1][j] > 0) {
-            open.add(coordToValue(row - 1, col));
+        if (inBounds(i - 1, j) && grid[i - 1][j]) {
+            union(coordToValue(row - 1, col), current);
         }
-        if (inBounds(i, j + 1) && grid[i][j + 1] > 0) {
-            open.add(coordToValue(row, col + 1));
+        if (inBounds(i, j + 1) && grid[i][j + 1]) {
+            union(coordToValue(row, col + 1), current);
         }
-        if (inBounds(i, j - 1) && grid[i][j - 1] > 0) {
-            open.add(coordToValue(row, col - 1));
+        if (inBounds(i, j - 1) && grid[i][j - 1]) {
+            union(coordToValue(row, col - 1), current);
         }
-        return open;
     }
 
     private boolean inBounds(int i, int j) {
@@ -111,7 +107,12 @@ public class Percolation {
     }
 
     private void union(int p, int q) {
+        backwash.union(p, q);
         uf.union(p, q);
+    }
+
+    private void unionBackwash(int current) {
+        backwash.union(current, VIRTUAL_BOT);
     }
 
     private boolean connected(int p, int q) {
