@@ -9,6 +9,7 @@ public class Percolation {
     private UF uf;
     private int top;
     private int bot;
+    private boolean percolated;
 
     public  Percolation(int n) {
         // create n-by-n grid, with all sites blocked
@@ -87,6 +88,7 @@ public class Percolation {
         // either way, top and bottom of each UF class will point to
         // "virtual" top and bottom sites, which point to every site on top and
         // bottom
+
         return connected(top, bot);
     }
 
